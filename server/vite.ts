@@ -7,22 +7,22 @@ import { nanoid } from "nanoid";
 import type { Server } from "http";
 
 // ---------------------------------------------------------------------
-// 1. Logger – tiny wrapper used in the file (same as your original)
+// 1. Tiny logger (kept exactly as you had it)
 // ---------------------------------------------------------------------
 const viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
+  const time = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
   });
-  console.log(`${formattedTime} [${source}] ${message}`);
+  console.log(`${time} [${source}] ${message}`);
 }
 
 // ---------------------------------------------------------------------
-// 2. Vite dev middleware (unchanged – only runs in local dev)
+// 2. Vite dev middleware – only runs locally (NODE_ENV=development)
 // ---------------------------------------------------------------------
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
@@ -32,8 +32,8 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    // @ts-ignore – vite_config_default is imported from ../vite.config
-    ...vite_config_default,
+    // Import your root vite.config.ts (no need for a separate default)
+    ...(await import("../vite.config.js")).default,
     configFile: false,
     customLogger: {
       ...viteLogger,
@@ -50,24 +50,23 @@ export async function setupVite(app: Express, server: Server) {
 
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
-
     try {
-      const clientTemplate = path.resolve(
+      const templatePath = path.resolve(
         import.meta.dirname,
         "..",
         "client",
         "index.html"
       );
+      let template = await fs.promises.readFile(templatePath, "utf-8");
 
-      // always reload the index.html file from disk (dev hot‑reload)
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      // bust cache in dev
       template = template.replace(
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
       );
 
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      const html = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(html);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -76,14 +75,14 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 // ---------------------------------------------------------------------
-// 3. Production static‑file serving – **FIXED PATH FOR VERCEL**
+// 3. Production static‑file serving – points to Vite’s build output
 // ---------------------------------------------------------------------
-export function serveStatic(app: express.Express) {
+export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
-      `Build missing: ${distPath}\nRun "npm run build" first.`
+      `Static build not found: ${distPath}\nRun "npm run build" first.`
     );
   }
 
@@ -92,5 +91,5 @@ export function serveStatic(app: express.Express) {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 
-  console.log(`Serving static files from ${distPath}`);
+  log(`Serving static files from ${distPath}`);
 }
