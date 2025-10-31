@@ -64,10 +64,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const server: Server = await registerRoutes(app);
 
   // Seed only in dev
-  if (app.get("env") === "development") {
-    await seedProjects();
-    log("Seeded 7 projects");
-  }
+  // if (app.get("env") === "development") {
+  //   await seedProjects();
+  //   log("Seeded 7 projects");
+  // }
 
   // Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

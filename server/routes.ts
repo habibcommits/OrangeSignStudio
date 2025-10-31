@@ -1,10 +1,11 @@
 // routes.ts
 import type { Express } from "express";
+import path from "path";
 import { createServer, type Server } from "http";
 import multer from "multer";
-import path from "path";
 import { storage } from "./storage";
 import { insertContactSchema, insertProjectSchema } from "@shared/schema";
+
 import {
   hashPassword,
   comparePassword,
@@ -15,7 +16,7 @@ import {
 
 const upload = multer({
   storage: multer.diskStorage({
-    destination: "attached_assets/uploads/",
+    destination: "client/public/uploads/",
     filename: (req, file, cb) => {
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
       cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
@@ -96,7 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Image is required" });
         }
 
-        const imageUrl = `/attached_assets/uploads/${req.file.filename}`;
+        const imageUrl = `/public/uploads/${req.file.filename}`;
 
         const data = insertProjectSchema.parse({
           title,
