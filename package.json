@@ -3,19 +3,16 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "scripts": {
-    
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "cross-env NODE_ENV=development tsx server/index.ts",
-    "dev:client": "vite",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build",
-    "build:server": "npx tsc --project .",
-    "vercel-build": "npm run build",
-    "start": "cross-env NODE_ENV=production node dist/server/index.js",
-    "check": "tsc --noEmit",
-    "db:push": "drizzle-kit push"
-  },
+ "scripts": {
+  "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+  "dev:server": "cross-env NODE_ENV=development tsx server/index.ts",
+  "dev:client": "vite",
+  "build": "npm run build:client && npm run build:server",
+  "build:client": "vite build",
+  "build:server": "tsc --project .",
+  "vercel-build": "npm run build",
+  "start": "cross-env NODE_ENV=production node dist/server/index.js"
+},
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",

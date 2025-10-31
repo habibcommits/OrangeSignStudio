@@ -1,0 +1,13 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+export function ProjectsSection() {
+    const { data: projects = [], isLoading } = useQuery({
+        queryKey: ["/api/projects"],
+    });
+    const displayProjects = projects.slice(0, 6);
+    return (_jsx("section", { id: "projects", className: "py-20 bg-muted/30", children: _jsxs("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8", children: [_jsxs("div", { className: "text-center mb-12", children: [_jsxs("h2", { className: "font-heading font-bold text-3xl sm:text-4xl md:text-5xl mb-4", children: ["Our ", _jsx("span", { className: "text-primary", children: "Projects" })] }), _jsx("p", { className: "text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed", children: "Showcasing excellence in every project we deliver" })] }), isLoading ? (_jsx("div", { className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8", children: [...Array(6)].map((_, i) => (_jsx("div", { className: "aspect-[4/3] rounded-lg bg-muted animate-pulse" }, i))) })) : (_jsx("div", { className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8", children: displayProjects.map((project) => (_jsxs("div", { className: "group relative overflow-hidden rounded-lg hover-elevate", "data-testid": `card-project-${project.id}`, children: [_jsx("div", { className: "aspect-[4/3] overflow-hidden", children: _jsx("img", { src: project.imageUrl, alt: project.title, className: "w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" }) }), _jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6", children: _jsxs("div", { className: "text-white", children: [_jsx("h3", { className: "font-heading font-semibold text-xl mb-1", children: project.title }), _jsx("p", { className: "text-sm text-white/80", children: project.description })] }) })] }, project.id))) })), _jsx("div", { className: "text-center", children: _jsx(Button, { size: "lg", asChild: true, "data-testid": "button-view-all-projects", children: _jsxs(Link, { href: "/projects", children: ["View All Projects ", _jsx(ArrowRight, { className: "ml-2 h-5 w-5" })] }) }) })] }) }));
+}
+//# sourceMappingURL=ProjectsSection.js.map

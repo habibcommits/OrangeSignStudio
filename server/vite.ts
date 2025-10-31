@@ -78,25 +78,19 @@ export async function setupVite(app: Express, server: Server) {
 // ---------------------------------------------------------------------
 // 3. Production static‑file serving – **FIXED PATH FOR VERCEL**
 // ---------------------------------------------------------------------
-export function serveStatic(app: Express) {
-  // Vite builds into ../dist/public (see vite.config.ts → outDir)
+export function serveStatic(app: express.Express) {
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
-      `Could not find the build directory: ${distPath}\n` +
-        `Run "npm run build" (or "vite build") before starting the server.\n` +
-        `Your vite.config.ts sets outDir: "../dist/public" – this path matches.`
+      `Build missing: ${distPath}\nRun "npm run build" first.`
     );
   }
 
-  // Serve every file inside dist/public
   app.use(express.static(distPath));
-
-  // SPA fallback – any unknown route → index.html (React Router works)
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 
-  log(`Serving production assets from: ${distPath}`);
+  console.log(`Serving static files from ${distPath}`);
 }

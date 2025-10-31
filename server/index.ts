@@ -1,9 +1,9 @@
 // server/index.ts
 import "dotenv/config";                     // ← loads .env
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { seedProjects } from "./seed";
+import { registerRoutes } from "./routes.js";
+import { setupVite, serveStatic } from "./vite.js";
+import { seedProjects } from "./seed.js";
 import type { Server } from "http";
 
 const app = express();
@@ -51,7 +51,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     let line = `${req.method} ${path} ${res.statusCode} ${ms}ms`;
     if (captured) line += ` :: ${JSON.stringify(captured)}`;
     if (line.length > 80) line = line.slice(0, 79) + "…";
-    log(line);
+    console.log(line);
   });
 
   next();
@@ -90,6 +90,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   // **Remove host & reusePort** → fixes ENOTSUP on Windows
   server.listen(port, () => {
-    log(`serving on http://localhost:${port}`);
+    console.log(`serving on http://localhost:${port}`);
   });
 })();

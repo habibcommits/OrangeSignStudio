@@ -3,13 +3,13 @@ import type { Express } from "express";
 import path from "path";
 import { createServer, type Server } from "http";
 import multer from "multer";
-import { storage } from "./storage";
-import { insertContactSchema, insertProjectSchema } from "@shared/schema";
+import { storage } from "./storage.js";
+import { insertContactSchema, insertProjectSchema } from "@shared/schema.js";
 import {
   generateToken,
   authenticateToken,
   type AuthRequest,
-} from "./auth";
+} from "./auth.js";
 
 // ---------------------------------------------------------------------
 // 1. Multer – memory storage
