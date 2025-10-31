@@ -1,87 +1,95 @@
+// server/index.ts
+import "dotenv/config";                     // ← loads .env
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedProjects } from "./seed";
+import type { Server } from "http";
 
 const app = express();
 
-declare module 'http' {
-  interface IncomingMessage {
-    rawBody: unknown
+// ---------------------------------------------------------------
+// 1. rawBody for Stripe / webhooks
+// ---------------------------------------------------------------
+declare global {
+  namespace Express {
+    interface Request {
+      rawBody?: Buffer;
+    }
   }
 }
-app.use(express.json({
-  verify: (req, _res, buf) => {
-    req.rawBody = buf;
-  }
-}));
+
+// ---------------------------------------------------------------
+// 2. Body parsers
+// ---------------------------------------------------------------
+app.use(
+  express.json({
+    verify: (req: Request, _res: Response, buf: Buffer) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
+// ---------------------------------------------------------------
+// 3. API logger (only /api)
+// ---------------------------------------------------------------
+app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let captured: any;
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
+  const orig = res.json;
+  res.json = function (body) {
+    captured = body;
+    return orig.call(this, body);
   };
 
   res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
+    if (!path.startsWith("/api")) return;
+    const ms = Date.now() - start;
+    let line = `${req.method} ${path} ${res.statusCode} ${ms}ms`;
+    if (captured) line += ` :: ${JSON.stringify(captured)}`;
+    if (line.length > 80) line = line.slice(0, 79) + "…";
+    log(line);
   });
 
   next();
 });
 
+// ---------------------------------------------------------------
+// 4. Bootstrap
+// ---------------------------------------------------------------
 (async () => {
-  const server = await registerRoutes(app);
+  const server: Server = await registerRoutes(app);
 
-  // Seed initial projects in development
+  // Seed only in dev
   if (app.get("env") === "development") {
     await seedProjects();
+    log("Seeded 7 projects");
   }
 
+  // Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
+    const status = err.status ?? err.statusCode ?? 500;
+    res.status(status).json({ message: err.message ?? "Server error" });
+    if (app.get("env") === "development") throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Vite (dev) or static files (prod)
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  // ---------------------------------------------------------------
+  // 7. LISTEN – **Windows/Node 22 fix**
+  // ---------------------------------------------------------------
+  const port = Number.parseInt(process.env.PORT ?? "5000", 10);
+
+  // **Remove host & reusePort** → fixes ENOTSUP on Windows
+  server.listen(port, () => {
+    log(`serving on http://localhost:${port}`);
   });
 })();
