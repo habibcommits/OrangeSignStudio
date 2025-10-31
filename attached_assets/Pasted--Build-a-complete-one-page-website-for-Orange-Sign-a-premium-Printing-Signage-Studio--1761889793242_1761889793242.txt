@@ -1,0 +1,139 @@
+⚡ Build a complete **one-page website** for **Orange Sign** — a premium Printing & Signage Studio — using **React (frontend)** + **Node/Express (serverless backend)**.  
+The project must be **fully deployable on Vercel** with ZERO build/runtime errors.
+
+─────────────────────────────
+🏢 COMPANY INFORMATION
+─────────────────────────────
+Name: Orange Sign
+Type: Printing & Signage Studio
+Description: Premium panaflex printing, LED signage, and large-format advertising solutions.
+Tagline: “We transform brands into visual experiences.”
+Experience: 30+ Years
+Projects Completed: 500+
+Clients Served: 5K+
+Coverage: Nationwide printing solutions across Islamabad and Rawalpindi.
+
+─────────────────────────────
+📞 CONTACT DETAILS
+─────────────────────────────
+Phone: +92 3022360007
+Email: orangesign1998@gmail.com
+Working Hours: Mon–Sat, 9AM–8PM
+Response Time: Within 24 hours
+Address: Shop No.11, Orange Sign, Capital Plaza, G-11 Markaz G-11, Islamabad, 44000, Pakistan
+
+─────────────────────────────
+🌐 SITE STRUCTURE (Single Page)
+─────────────────────────────
+This is a **One Page Application** (SPA) built in **React**, where each section scrolls smoothly and has a **“Learn More”** button.  
+Each button scrolls to its respective section OR redirects as defined below.
+
+Sections:
+1. **Hero Section** — Brand tagline, CTA buttons (Get Started / Contact via WhatsApp)
+2. **About Section** — Company details, experience, and client stats
+3. **Services Section** — Cards for core services (Design, Printing, Outdoor, etc.)
+4. **Projects Section** — Gallery preview (6–8 sample projects)
+   - “Learn More” → `/projects`
+5. **Testimonials Section**
+   - 4 client testimonials as cards
+   - “Learn More” → redirect to Google Maps reviews:
+     🔗 https://maps.app.goo.gl/MPMpKkpZVxRharrt6
+6. **Contact Section**
+   - Contact form (name, email, phone, message)
+   - Sends form data via `/api/contact`
+   - Include “Contact via WhatsApp” button → opens WhatsApp chat with message text from the form
+   - Example message: “Hello Orange Sign, I visited your website and would like to discuss [message].”
+7. **Google Map Embed** (before footer)
+   Embed this exact iframe:
+
+   <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3320.601460750391!2d72.99520317549927!3d33.66748707330426!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38df97fc97615577%3A0xd7f57ccd75b4287f!2sOrange%20Sign%20PanaFlex!5e0!3m2!1sen!2s!4v1761889648578!5m2!1sen!2s" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+8. **Footer**
+   - © 2025 Orange Sign. All Rights Reserved.
+   - Include navigation and contact quick links.
+
+─────────────────────────────
+🪧 PROJECTS PAGE (`/projects`)
+─────────────────────────────
+- Displays all recent projects dynamically from `/api/projects`
+- Each project shows: image, title, description
+- Responsive grid layout
+- “Back to Home” button returns to the main page
+
+─────────────────────────────
+🛠️ ADMIN PANEL (`/admin`)
+─────────────────────────────
+- Secure login with credentials:
+  Email: orangesign@gmail.com
+  Password: admin@123
+- Features:
+  ✅ Add new project (title, description, image upload)
+  ❌ Delete existing project
+- Store data in `/data/projects.json`
+- Serverless API routes:
+  - `GET /api/projects` → fetch projects
+  - `POST /api/projects` → add project
+  - `DELETE /api/projects/:id` → delete project
+- Include authentication (simple JWT or token)
+- Logout button
+- Must work fully in Vercel’s serverless environment
+
+─────────────────────────────
+🎨 DESIGN & THEME
+─────────────────────────────
+- Primary color: **Orange**
+- Secondary colors: White / Dark Gray
+- Light/Dark Mode toggle (persist via localStorage)
+- Styling: **TailwindCSS**
+- Animations: **Framer Motion**
+- Font: Inter or Poppins
+- Layout: modern, card-based, rounded corners, shadows, responsive
+- Add floating **WhatsApp Chat button** on bottom-right corner (always visible on every page)
+
+─────────────────────────────
+💬 TESTIMONIALS DATA
+─────────────────────────────
+1. Ayesha Khan — Marketing Manager, BrightVision Advertising  
+   “Their panaflex prints are stunning! Colors are vibrant and durable.”
+2. Usman Ali — Owner, Ali Signs & Graphics  
+   “Quality and consistency are unmatched — every print is perfect.”
+3. Hira Malik — Event Coordinator, Starline Events  
+   “They always deliver on time; banners looked premium and stood out.”
+4. Ahmed Raza — Brand Executive, Metro Mart Pvt. Ltd.  
+   “Print quality and finishing are exceptional — still looks new after months.”
+
+─────────────────────────────
+⚙️ TECH STACK
+─────────────────────────────
+Frontend:
+- React (Vite or Next.js)
+- TailwindCSS
+- Framer Motion
+- Axios
+
+Backend:
+- Node.js + Express
+- JSON file storage
+- Serverless functions under `/api`
+- JWT or token auth for admin
+
+─────────────────────────────
+🧾 DEPLOYMENT REQUIREMENTS
+─────────────────────────────
+- Must deploy flawlessly on **Vercel**
+- All backend routes inside `/api` directory
+- Include `vercel.json` config for routing
+- No background processes or custom Node servers
+- No CORS issues
+- Build must pass with no warnings or errors
+
+─────────────────────────────
+📱 EXTRAS
+─────────────────────────────
+- Fully responsive (mobile/tablet/desktop)
+- Fast page loads & optimized images
+- SEO meta tags for title, description, and OG
+- “Back to Home” buttons on all subpages
+- Pop-up WhatsApp chat widget on bottom-right
+- Smooth scroll navigation between sections
+- All “Learn More” buttons scroll or redirect properly
